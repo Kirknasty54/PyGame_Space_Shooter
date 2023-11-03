@@ -10,7 +10,7 @@ from button import *
 pg.font.init()
 import random
 
-#this is here to set the font style of the text in our menu buttons, probably going to move this to the button class
+#this is here to set the font style of the text in our menu buttons, probably going to move this to the button class also used this for the pause menu
 def get_font(size):
     return pg.font.Font(os.path.join("../assets", "font.ttf"))
 
@@ -43,8 +43,11 @@ class Game:
     #this creates the main menu and is where we can click on buttons to either play the game or quit the program
     def main_menu(self):
         while True:
+            #change our window caption title, really just here cause I liked having the seperation between menu and gameplay
+            #also draw our main menu background
             pg.display.set_caption('Main Menu')
             WIN.blit(BG1, (0, 0))
+            #this will track our mouse position so we can tell when one of our buttons are clicked
             MENU_MOUSE_POS = pg.mouse.get_pos()
             MENU_TEXT = get_font(100).render("MAIN MENU", True, "#b68f40")
             MENU_RECT = MENU_TEXT.get_rect(center=(WIN.get_width()/2, WIN.get_height()/2-300))
@@ -56,10 +59,12 @@ class Game:
 
             WIN.blit(MENU_TEXT, MENU_RECT)
 
+            #this will change the color of the text if our mouse position is found to be within the button 'model'
             for button in [PLAY_BUTTON, QUIT_BUTTON]:
                 button.changeColor(MENU_MOUSE_POS)
                 button.update(WIN)
 
+            #typical game loop checking for player quitting, also checking if the player clicks on the play or quit button and does the corresponding action
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
@@ -73,7 +78,36 @@ class Game:
             pg.display.update()
 
     def draw_pause(self):
-        pass
+        while True:
+            MENU_MOUSE_POS = pg.mouse.get_pos()
+            PAUSE_TEXT = get_font(100).render("Resume Game", True, '#b68f40')
+            PAUSE_RECT = PAUSE_TEXT.get_rect(center=(WIN.get_width()/2, WIN.get_height()/2- 300))
+            PLAY_BUTTON = Button(image=pg.transform.scale(pg.image.load(os.path.join("../assets", "button.png")), (300, 120)),
+                                 pos=(WIN.get_width() / 2, WIN.get_height() / 2 - 150),
+                                 text_input="PLAY", font=get_font(75), base_color="White", hovering_color="#FF0000")
+            QUIT_BUTTON = Button(image=pg.transform.scale(pg.image.load(os.path.join("../assets", "button.png")), (300, 120)),
+                                 pos=(WIN.get_width() / 2, WIN.get_height() / 2),
+                                 text_input="QUIT", font=get_font(75), base_color="White", hovering_color="#FF0000")
+            WIN.blit(PAUSE_TEXT, PAUSE_RECT)
+            for button in [PLAY_BUTTON, QUIT_BUTTON]:
+                button.changeColor(MENU_MOUSE_POS)
+                button.update(WIN)
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                if pg.key.get_pressed()[pg.K_ESCAPE]:
+                    return
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        Ship.pause = False
+                        return
+                        #self.run()
+                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pg.quit()
+                        sys.exit()
+            pg.display.update()
 
     def respawn(self):
         pass
@@ -106,13 +140,17 @@ class Game:
             clock.tick(FPS)
             self.player.movement()
             self.redraw_window()
-            if self.lives <= 0 or self.player.health <= 0:
+            if self.lives <= 0 and self.player.health <= 0:
                 self.lost = True
                 self.lost_count += 1
+
+            elif self.player.health <= 0 and self.lives > 0:
+                self.lives-=1
 
             if self.lost:
                 if self.lost_count > FPS * 3:
                     self.runCheck = False
+                    return
                 else:
                     continue
 
@@ -129,7 +167,7 @@ class Game:
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    run = False
+                    pg.quit()
 
                 if keys[pg.K_ESCAPE]:
                     if Ship.pause:
