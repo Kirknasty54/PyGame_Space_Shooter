@@ -1,4 +1,5 @@
 import pygame as pg, sys
+print("this should auto update")
 pg.init()
 import time
 from pygame.locals import *
