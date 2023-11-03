@@ -1,3 +1,4 @@
+#here is all of our imports, can def optimize this, but whatever it works for now
 import pygame as pg, sys
 pg.init()
 import time
@@ -9,12 +10,16 @@ from button import *
 pg.font.init()
 import random
 
+#this is here to set the font style of the text in our menu buttons, probably going to move this to the button class
 def get_font(size):
     return pg.font.Font(os.path.join("../assets", "font.ttf"))
 
+#actual game class which contains our main menu and game loops, along with some other functions
 class Game:
+    #just an initilzation
     def __init__(self):
         pg.init()
+        #these variables are set to some variables created in the settings folder, might not be the best implementation but works for now
         self.player = Player(300, 650, False)
         self.clock = clock
         self.lost = False
@@ -35,9 +40,10 @@ class Game:
         self.wave_length = wave_length
         self.difficulty = difficulty
 
-    #this creates the main menu and is where we can click on buttons to either play the game or
+    #this creates the main menu and is where we can click on buttons to either play the game or quit the program
     def main_menu(self):
         while True:
+            pg.display.set_caption('Main Menu')
             WIN.blit(BG1, (0, 0))
             MENU_MOUSE_POS = pg.mouse.get_pos()
             MENU_TEXT = get_font(100).render("MAIN MENU", True, "#b68f40")
@@ -67,9 +73,10 @@ class Game:
             pg.display.update()
 
     def draw_pause(self):
-        pg.draw.rect(surface, (128, 128, 128, 150), [0, 0, screen_width, screen_height])
-        WIN.blit(surface, (0, 0))
-        pg.display.update()
+        pass
+
+    def respawn(self):
+        pass
 
     def redraw_window(self):
         WIN.fill("black")
@@ -94,6 +101,7 @@ class Game:
 
     def run(self):
         while self.runCheck == True:
+            pg.display.set_caption("Space Invaders")
             #clock will be ticked based on FPS, makes sure game stay consistent on any device
             clock.tick(FPS)
             self.player.movement()
@@ -102,7 +110,6 @@ class Game:
                 self.lost = True
                 self.lost_count += 1
 
-            messageOcurrance = 0
             if self.lost:
                 if self.lost_count > FPS * 3:
                     self.runCheck = False
@@ -110,7 +117,7 @@ class Game:
                     continue
 
             #if no enemies are left, increment level, increment num of enimes
-            if len(enemies) == 0:
+            if len(enemies) == 0 and not Ship.pause:
                 self.level += 1
                 self.difficulty *= 0.9
                 self.wave_length += 5
@@ -124,24 +131,12 @@ class Game:
                 if event.type == pg.QUIT:
                     run = False
 
-                #figure this bullshit out later
-                '''if event.type == VIDEORESIZE:
-                    pass #WIN = pg.display.set_mode((event.w, event. h), pg.RESIZABLE)'''
                 if keys[pg.K_ESCAPE]:
                     if Ship.pause:
                         Ship.pause = False
                     else:
                         Ship.pause = True
                         self.draw_pause()
-                        print("the game is now pauses")
-                    #pg.quit()
-                    #sys.exit()
-                '''if keys[pg.K_f]:
-                    fullscreen = not fullscreen
-                    if fullscreen:
-                        pass#WIN = pg.display.set_mode(monitor_size, pg.FULLSCREEN)
-                    else:
-                        pass#WIN = pg.display.set_mode((WIN.get_width(), WIN.get_height()), pg.FULLSCREEN)'''
 
             for enemy in enemies[:]:
                 enemy.move(enemy_vel)
@@ -154,7 +149,6 @@ class Game:
                     self.player.health -= 10
                     enemies.remove(enemy)
                 elif enemy.y + enemy.get_height() > WIN.get_height():
-                    print("Successuly lost life")
                     self.lives -= 1
                     enemies.remove(enemy)
 
@@ -163,4 +157,3 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     game.main_menu()
-    #game.run()

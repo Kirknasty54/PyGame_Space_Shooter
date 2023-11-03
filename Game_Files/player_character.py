@@ -39,7 +39,6 @@ class Player(Ship):
                 laser.move(vel)
                 if laser.off_screen(WIN.get_height()):
                     self.lasers.remove(laser)
-                    print("laser successfuly remove")
                 else:
                     for obj in objs:
                         if laser.collision(obj):

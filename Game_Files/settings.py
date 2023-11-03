@@ -14,10 +14,9 @@ lost_count = 0
 enemies = []
 wave_length = 5
 enemy_vel = 1
-pg.display.set_caption("Space Invaders")
 monitor_size = pg.display.Info()
 screen_width, screen_height = monitor_size.current_w, monitor_size.current_h
-WIN = pg.display.set_mode((screen_width-10, screen_height-50), pg.RESIZABLE)
+WIN = pg.display.set_mode((screen_width-10, screen_height-50))
 surface = pg.Surface((screen_width, screen_height), pg.SRCALPHA)
 BG = pg.transform.scale(pg.image.load(os.path.join("../assets", "background-black.png")).convert_alpha(), (WIN.get_width(), WIN.get_height()))
 BG1 = pg.transform.scale(pg.image.load(os.path.join("../assets", "main_menu_screen.png")).convert_alpha(), (WIN.get_width(), WIN.get_height()))
